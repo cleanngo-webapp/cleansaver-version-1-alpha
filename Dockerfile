@@ -51,14 +51,24 @@ WORKDIR /var/www/html
 # Copy composer files first for better caching
 COPY composer.json composer.lock ./
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Install PHP dependencies (skip post-install scripts that require Laravel)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Copy application files
 COPY . .
 
 # Copy built frontend from Stage 1
 COPY --from=frontend /app/public/dist ./public/dist
+
+# Create minimal .env for Laravel commands
+RUN echo 'APP_NAME=Laravel
+APP_ENV=production
+APP_KEY=base64:placeholder
+APP_DEBUG=false
+APP_URL=http://localhost' > .env
+
+# Run Laravel post-install commands with fallback
+RUN php artisan package:discover --ansi || echo "Package discovery skipped"
 
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
