@@ -57,8 +57,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Copy application files
 COPY . .
 
-# Copy built frontend from Stage 1
-COPY --from=frontend /app/public/dist ./public/dist
+# Copy built frontend from Stage 1 to correct Laravel Vite location
+COPY --from=frontend /app/public/dist ./public/build
 
 # Create minimal .env for Laravel commands
 RUN echo "APP_NAME=Laravel" > .env && \
