@@ -9,15 +9,7 @@ export default defineConfig({
         }),
     ],
     build: {
-        // Ensure CSS is properly extracted and minified
-        cssCodeSplit: false,
-        rollupOptions: {
-            output: {
-                // Ensure consistent asset naming
-                assetFileNames: "assets/[name].[hash][extname]",
-                chunkFileNames: "assets/[name].[hash].js",
-                entryFileNames: "assets/[name].[hash].js",
-            },
-        },
+        // Enable CSS code splitting to avoid conflict with Laravel Vite plugin
+        cssCodeSplit: true,
     },
 });
