@@ -99,15 +99,15 @@ RUN echo 'server { \
 }' > /etc/nginx/sites-available/default
 
 # Create startup script
-RUN echo '#!/bin/bash \
-set -e \
-\
-# Start PHP-FPM in background \
-php-fpm -D \
-\
-# Start nginx in foreground \
-nginx -g "daemon off;"' > /start.sh \
-    && chmod +x /start.sh
+RUN echo '#!/bin/bash' > /start.sh && \
+    echo 'set -e' >> /start.sh && \
+    echo '' >> /start.sh && \
+    echo '# Start PHP-FPM in background' >> /start.sh && \
+    echo 'php-fpm -D' >> /start.sh && \
+    echo '' >> /start.sh && \
+    echo '# Start nginx in foreground' >> /start.sh && \
+    echo 'nginx -g "daemon off;"' >> /start.sh && \
+    chmod +x /start.sh
 
 # Expose port 80
 EXPOSE 80
