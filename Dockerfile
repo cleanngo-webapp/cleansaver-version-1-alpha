@@ -5,14 +5,22 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json* ./
 
-# Install dependencies using npm
-RUN npm ci --only=production || npm install
+# Install dependencies using npm (including dev dependencies for build)
+RUN npm install
 
 # Copy source files
 COPY . .
 
-# Build frontend assets
-RUN npm run build
+# Debug: Check if build script exists and dependencies are installed
+RUN echo "Checking package.json build script..." && \
+    cat package.json | grep -A 5 -B 5 "build" && \
+    echo "Checking if vite is installed..." && \
+    npm list vite && \
+    echo "Checking npm scripts..." && \
+    npm run
+
+# Build frontend assets with error handling
+RUN npm run build || (echo "Build failed, trying alternative..." && npx vite build)
 
 # Stage 2 - Backend (Laravel + PHP + Composer + Nginx)
 FROM php:8.1.25-fpm AS backend
