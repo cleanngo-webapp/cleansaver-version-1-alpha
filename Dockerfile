@@ -19,6 +19,9 @@ COPY public/ ./public/
 # Build frontend assets
 RUN pnpm run build
 
+# Verify build output
+RUN ls -la public/build/ || echo "Build directory not found"
+
 # Stage 2 - Backend (Laravel + PHP + Composer)
 FROM php:8.1-fpm AS backend
 
@@ -54,6 +57,9 @@ COPY . .
 # Copy built frontend from Stage 1 (correct path for Vite)
 COPY --from=frontend /app/public/build ./public/build
 
+# Verify frontend assets were copied
+RUN ls -la public/build/ || echo "Frontend build files not found"
+
 # Create .env file from environment variables if it doesn't exist
 RUN if [ ! -f .env ]; then \
         echo "APP_NAME=Laravel" > .env && \
@@ -77,13 +83,15 @@ RUN if [ ! -f .env ]; then \
 # Set proper permissions
 RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+    && chmod -R 755 /var/www/bootstrap/cache \
+    && chmod -R 755 /var/www/public
 
 # Generate application key if not set and run Laravel setup
 RUN php artisan key:generate --no-interaction || echo "Key generation failed, continuing..." && \
     php artisan config:cache && \
     php artisan route:cache && \
-    php artisan view:cache
+    php artisan view:cache && \
+    php artisan storage:link || echo "Storage link failed, continuing..."
 
 # Create nginx configuration
 RUN echo 'server { \
