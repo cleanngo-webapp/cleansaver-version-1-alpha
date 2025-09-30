@@ -4,7 +4,6 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "hot": "concurrently \"php artisan serve\" \"pnpm run dev\"",
         "clear": "php artisan cache:clear && php artisan config:clear && php artisan route:clear && php artisan view:clear"
     },
     "devDependencies": {
