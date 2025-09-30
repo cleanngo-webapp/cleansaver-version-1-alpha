@@ -31,6 +31,10 @@
         && a2enmod rewrite
     
     WORKDIR /var/www/html
+
+    # Set Apache DocumentRoot to Laravel's public folder
+    RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf /etc/apache2/apache2.conf
+
     
     # Copy composer
     COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
