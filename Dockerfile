@@ -61,11 +61,11 @@ COPY . .
 COPY --from=frontend /app/public/dist ./public/dist
 
 # Create minimal .env for Laravel commands
-RUN echo 'APP_NAME=Laravel
-APP_ENV=production
-APP_KEY=base64:placeholder
-APP_DEBUG=false
-APP_URL=http://localhost' > .env
+RUN echo "APP_NAME=Laravel" > .env && \
+    echo "APP_ENV=production" >> .env && \
+    echo "APP_KEY=base64:placeholder" >> .env && \
+    echo "APP_DEBUG=false" >> .env && \
+    echo "APP_URL=http://localhost" >> .env
 
 # Run Laravel post-install commands with fallback
 RUN php artisan package:discover --ansi || echo "Package discovery skipped"
