@@ -1,28 +1,31 @@
-# Stage 1 - Build Frontend (Vite with npm - more reliable in Docker)
+# Stage 1 - Build Frontend (Vite with pnpm - matching project setup)
 FROM node:22.14.0 AS frontend
 WORKDIR /app
 
+# Install pnpm globally
+RUN npm install -g pnpm
+
 # Copy package files and configs
-COPY package.json package-lock.json* ./
+COPY package.json pnpm-lock.yaml ./
 COPY postcss.config.js tailwind.config.js ./
 
 # Debug: Check package files and configs
 RUN echo "=== Checking package files ===" && \
     echo "Package.json exists:" && \
     ls -la package.json && \
-    echo "Package-lock.json exists:" && \
-    ls -la package-lock.json* 2>/dev/null || echo "No package-lock.json found" && \
+    echo "pnpm-lock.yaml exists:" && \
+    ls -la pnpm-lock.yaml && \
     echo "PostCSS config exists:" && \
     ls -la postcss.config.js && \
     echo "Tailwind config exists:" && \
     ls -la tailwind.config.js && \
     echo "Node version:" && \
     node --version && \
-    echo "NPM version:" && \
-    npm --version
+    echo "PNPM version:" && \
+    pnpm --version
 
-# Install dependencies using npm (including dev dependencies for build)
-RUN npm install
+# Install dependencies using pnpm (including dev dependencies for build)
+RUN pnpm install --frozen-lockfile
 
 # Copy source files
 COPY . .
@@ -31,12 +34,14 @@ COPY . .
 RUN echo "Checking package.json build script..." && \
     cat package.json | grep -A 5 -B 5 "build" && \
     echo "Checking if vite is installed..." && \
-    npm list vite && \
-    echo "Checking npm scripts..." && \
-    npm run
+    pnpm list vite && \
+    echo "Checking pnpm scripts..." && \
+    pnpm run
 
 # Build frontend assets with error handling
-RUN npm run build || (echo "Build failed, trying alternative..." && npx vite build)
+RUN echo "Starting build process..." && \
+    NODE_ENV=production pnpm run build && \
+    echo "Build completed successfully!"
 
 # Verify build output - Laravel Vite plugin outputs to public/build/
 RUN echo "=== Checking Vite build output ===" && \
