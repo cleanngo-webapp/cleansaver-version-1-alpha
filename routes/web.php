@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 
+// Health check route for deployment monitoring
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok', 'timestamp' => now()]);
+});
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes

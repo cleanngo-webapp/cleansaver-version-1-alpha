@@ -52,7 +52,7 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Copy application code (excluding what's in .dockerignore)
-COPY . .
+COPY --chown=www-data:www-data . .
 
 # Copy built frontend from Stage 1 (correct path for Vite)
 COPY --from=frontend /app/public/build ./public/build
@@ -66,7 +66,7 @@ RUN if [ ! -f .env ]; then \
         echo "APP_ENV=production" >> .env && \
         echo "APP_KEY=" >> .env && \
         echo "APP_DEBUG=false" >> .env && \
-        echo "APP_URL=http://localhost" >> .env && \
+        echo "APP_URL=https://your-render-app.onrender.com" >> .env && \
         echo "DB_CONNECTION=pgsql" >> .env && \
         echo "DB_HOST=aws-1-ap-southeast-1.pooler.supabase.com" >> .env && \
         echo "DB_PORT=5432" >> .env && \
@@ -80,9 +80,8 @@ RUN if [ ! -f .env ]; then \
         echo "QUEUE_CONNECTION=sync" >> .env; \
     fi
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
+# Set proper permissions (simplified since we set ownership during copy)
+RUN chmod -R 755 /var/www/storage \
     && chmod -R 755 /var/www/bootstrap/cache \
     && chmod -R 755 /var/www/public
 
