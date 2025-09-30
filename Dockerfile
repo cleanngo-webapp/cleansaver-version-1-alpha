@@ -70,6 +70,17 @@ COPY . .
 # Copy built frontend from Stage 1 - Laravel Vite plugin outputs to public/build/
 COPY --from=frontend /app/public/build ./public/build
 
+# Debug: Verify build assets were copied correctly
+RUN echo "=== Verifying build assets ===" && \
+    echo "Build directory contents:" && \
+    ls -la ./public/build/ && \
+    echo "Manifest file:" && \
+    cat ./public/build/manifest.json 2>/dev/null || echo "No manifest.json found" && \
+    echo "CSS files:" && \
+    find ./public/build/ -name "*.css" 2>/dev/null || echo "No CSS files found" && \
+    echo "JS files:" && \
+    find ./public/build/ -name "*.js" 2>/dev/null || echo "No JS files found"
+
 # Create minimal .env for Laravel commands
 RUN echo "APP_NAME=Laravel" > .env && \
     echo "APP_ENV=production" >> .env && \
@@ -85,17 +96,33 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Configure nginx for Laravel
+# Configure nginx for Laravel with proper static asset handling
 RUN echo 'server { \
     listen 80; \
     server_name localhost; \
     root /var/www/html/public; \
     index index.php; \
     \
+    # Handle static assets (CSS, JS, images, etc.) \
+    location ~* \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ { \
+        expires 1y; \
+        add_header Cache-Control "public, immutable"; \
+        try_files $uri =404; \
+    } \
+    \
+    # Handle Vite build assets \
+    location /build/ { \
+        expires 1y; \
+        add_header Cache-Control "public, immutable"; \
+        try_files $uri =404; \
+    } \
+    \
+    # Handle Laravel routes \
     location / { \
         try_files $uri $uri/ /index.php?$query_string; \
     } \
     \
+    # Handle PHP files \
     location ~ \.php$ { \
         fastcgi_pass 127.0.0.1:9000; \
         fastcgi_index index.php; \
@@ -103,7 +130,13 @@ RUN echo 'server { \
         include fastcgi_params; \
     } \
     \
+    # Deny access to hidden files \
     location ~ /\.ht { \
+        deny all; \
+    } \
+    \
+    # Deny access to sensitive files \
+    location ~ /\.(env|git) { \
         deny all; \
     } \
 }' > /etc/nginx/sites-available/default
