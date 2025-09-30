@@ -6,23 +6,24 @@
     # Copy only package files first for caching
     COPY package*.json ./
     
-    # Install dependencies with pinned versions
+    # Install dependencies
     RUN npm ci
     
     # Copy the rest of the app
     COPY . .
     
-    # Build assets (Vite + Tailwind)
+    # Build assets (Vite + Tailwind -> public/build + manifest.json)
     RUN npm run build
     
     
-  # ---------- Stage 2: PHP + Apache ----------
+    # ---------- Stage 2: PHP + Apache ----------
     FROM php:8.1.25-apache
-
+    
     # Install system dependencies + PostgreSQL headers
     RUN apt-get update && apt-get install -y \
         git unzip curl libpng-dev libonig-dev libxml2-dev zip libpq-dev \
-        && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd
+        && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd \
+        && rm -rf /var/lib/apt/lists/*
     
     # Enable Apache Rewrite
     RUN a2enmod rewrite
@@ -31,18 +32,26 @@
     COPY --from=composer:2.8.9 /usr/bin/composer /usr/bin/composer
     
     WORKDIR /var/www/html
-
+    
     # Set DocumentRoot to /public
     ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
     RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf \
         && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
     
-    # Copy app
+    # Copy app source
     COPY . .
+    
+    # Copy compiled assets from node build stage
     COPY --from=node_builder /app/public/build ./public/build
     
-    # Install PHP deps
+    # Install PHP deps (no dev for production)
     RUN composer install --no-dev --optimize-autoloader
+    
+    # Clear Laravel caches to ensure fresh config/routes/views
+    RUN php artisan config:clear && \
+        php artisan route:clear && \
+        php artisan view:clear && \
+        php artisan cache:clear
     
     # Permissions
     RUN chown -R www-data:www-data /var/www/html \
@@ -50,6 +59,4 @@
     
     EXPOSE 80
     CMD ["apache2-foreground"]
-    
-
     
