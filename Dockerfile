@@ -62,22 +62,22 @@ RUN ls -la public/build/ || echo "Frontend build files not found"
 
 # Create .env file from environment variables if it doesn't exist
 RUN if [ ! -f .env ]; then \
-        echo "APP_NAME=Laravel" > .env && \
-        echo "APP_ENV=production" >> .env && \
-        echo "APP_KEY=" >> .env && \
-        echo "APP_DEBUG=false" >> .env && \
-        echo "APP_URL=https://your-render-app.onrender.com" >> .env && \
-        echo "DB_CONNECTION=pgsql" >> .env && \
-        echo "DB_HOST=aws-1-ap-southeast-1.pooler.supabase.com" >> .env && \
-        echo "DB_PORT=5432" >> .env && \
-        echo "DB_DATABASE=postgres" >> .env && \
-        echo "DB_USERNAME=postgres.bscddyfdbwceljvjvbro" >> .env && \
-        echo "DB_PASSWORD=pjoHCtcFje2sCItg" >> .env && \
-        echo "LOG_CHANNEL=stack" >> .env && \
-        echo "LOG_LEVEL=error" >> .env && \
-        echo "CACHE_DRIVER=file" >> .env && \
-        echo "SESSION_DRIVER=file" >> .env && \
-        echo "QUEUE_CONNECTION=sync" >> .env; \
+    echo "APP_NAME=Laravel" > .env; \
+    echo "APP_ENV=production" >> .env; \
+    echo "APP_KEY=" >> .env; \
+    echo "APP_DEBUG=false" >> .env; \
+    echo "APP_URL=https://your-render-app.onrender.com" >> .env; \
+    echo "DB_CONNECTION=pgsql" >> .env; \
+    echo "DB_HOST=aws-1-ap-southeast-1.pooler.supabase.com" >> .env; \
+    echo "DB_PORT=5432" >> .env; \
+    echo "DB_DATABASE=postgres" >> .env; \
+    echo "DB_USERNAME=postgres.bscddyfdbwceljvjvbro" >> .env; \
+    echo "DB_PASSWORD=pjoHCtcFje2sCItg" >> .env; \
+    echo "LOG_CHANNEL=stack" >> .env; \
+    echo "LOG_LEVEL=error" >> .env; \
+    echo "CACHE_DRIVER=file" >> .env; \
+    echo "SESSION_DRIVER=file" >> .env; \
+    echo "QUEUE_CONNECTION=sync" >> .env; \
     fi
 
 # Set proper permissions (simplified since we set ownership during copy)
@@ -112,23 +112,25 @@ RUN echo 'server { \
 }' > /etc/nginx/sites-available/default
 
 # Create supervisor configuration
-RUN echo '[supervisord]' > /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'nodaemon=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'user=root' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '[program:php-fpm]' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'command=php-fpm' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stderr_logfile=/var/log/php-fpm.err.log' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stdout_logfile=/var/log/php-fpm.out.log' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '[program:nginx]' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'command=nginx -g "daemon off;"' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stderr_logfile=/var/log/nginx.err.log' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stdout_logfile=/var/log/nginx.out.log' >> /etc/supervisor/conf.d/supervisord.conf
+COPY <<EOF /etc/supervisor/conf.d/supervisord.conf
+[supervisord]
+nodaemon=true
+user=root
+
+[program:php-fpm]
+command=php-fpm
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/php-fpm.err.log
+stdout_logfile=/var/log/php-fpm.out.log
+
+[program:nginx]
+command=nginx -g "daemon off;"
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/nginx.err.log
+stdout_logfile=/var/log/nginx.out.log
+EOF
 
 # Expose port
 EXPOSE 80
