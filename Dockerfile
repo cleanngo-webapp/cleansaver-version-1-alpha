@@ -1,31 +1,30 @@
-# Stage 1 - Build Frontend (Vite with pnpm - matching project setup)
+# Stage 1 - Build Frontend (Vite with npm - more reliable in Docker)
 FROM node:22.14.0 AS frontend
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm
-
-# Copy package files and configs
-COPY package.json pnpm-lock.yaml ./
+# Copy package files and configs first
+COPY package.json package-lock.json ./
 COPY postcss.config.js tailwind.config.js ./
 
 # Debug: Check package files and configs
 RUN echo "=== Checking package files ===" && \
     echo "Package.json exists:" && \
     ls -la package.json && \
-    echo "pnpm-lock.yaml exists:" && \
-    ls -la pnpm-lock.yaml && \
+    echo "Package-lock.json exists:" && \
+    ls -la package-lock.json && \
     echo "PostCSS config exists:" && \
     ls -la postcss.config.js && \
     echo "Tailwind config exists:" && \
     ls -la tailwind.config.js && \
     echo "Node version:" && \
     node --version && \
-    echo "PNPM version:" && \
-    pnpm --version
+    echo "NPM version:" && \
+    npm --version
 
-# Install dependencies using pnpm (including dev dependencies for build)
-RUN pnpm install --frozen-lockfile
+# Install dependencies using npm (more reliable in Docker)
+RUN echo "Installing dependencies with npm..." && \
+    npm install && \
+    echo "Dependencies installed successfully!"
 
 # Copy source files
 COPY . .
@@ -34,13 +33,13 @@ COPY . .
 RUN echo "Checking package.json build script..." && \
     cat package.json | grep -A 5 -B 5 "build" && \
     echo "Checking if vite is installed..." && \
-    pnpm list vite && \
-    echo "Checking pnpm scripts..." && \
-    pnpm run
+    npm list vite && \
+    echo "Checking npm scripts..." && \
+    npm run
 
 # Build frontend assets with error handling
 RUN echo "Starting build process..." && \
-    NODE_ENV=production pnpm run build && \
+    NODE_ENV=production npm run build && \
     echo "Build completed successfully!"
 
 # Verify build output - Laravel Vite plugin outputs to public/build/
