@@ -105,22 +105,22 @@ RUN echo 'server { \
 }' > /etc/nginx/sites-available/default
 
 # Create supervisor configuration
-RUN echo '[supervisord] \
-nodaemon=true \
-\
-[program:php-fpm] \
-command=php-fpm \
-autostart=true \
-autorestart=true \
-stderr_logfile=/var/log/php-fpm.err.log \
-stdout_logfile=/var/log/php-fpm.out.log \
-\
-[program:nginx] \
-command=nginx -g "daemon off;" \
-autostart=true \
-autorestart=true \
-stderr_logfile=/var/log/nginx.err.log \
-stdout_logfile=/var/log/nginx.out.log' > /etc/supervisor/conf.d/supervisord.conf
+RUN echo '[supervisord]' > /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'nodaemon=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '[program:php-fpm]' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'command=php-fpm' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'stderr_logfile=/var/log/php-fpm.err.log' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'stdout_logfile=/var/log/php-fpm.out.log' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo '[program:nginx]' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'command=nginx -g "daemon off;"' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'stderr_logfile=/var/log/nginx.err.log' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'stdout_logfile=/var/log/nginx.out.log' >> /etc/supervisor/conf.d/supervisord.conf
 
 # Expose port
 EXPOSE 80
