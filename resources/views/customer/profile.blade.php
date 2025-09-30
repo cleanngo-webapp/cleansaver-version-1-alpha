@@ -259,7 +259,7 @@
 										<button type="button" id="auto-locate" 
 											class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors flex items-center gap-2 cursor-pointer">
 											<i class="ri-map-pin-line"></i>
-											<span class="hidden sm:inline">Auto Locate</span>
+											<span class="hidden sm:inline">Find on Map</span>
 										</button>
 									</div>
 								</div>
@@ -419,24 +419,165 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Simple geocoding function using OpenStreetMap
+    async function geocodeAddress() {
+        const line1 = document.querySelector('input[name="line1"]').value.trim();
+        const barangay = document.querySelector('input[name="barangay"]').value.trim();
+        const city = document.querySelector('input[name="city"]').value.trim();
+        const province = document.querySelector('input[name="province"]').value.trim();
+        const postalCode = document.querySelector('input[name="postal_code"]').value.trim();
+        
+        // Build address string with available fields
+        let addressParts = [];
+        if (line1) addressParts.push(line1);
+        if (barangay) addressParts.push(barangay);
+        if (city) addressParts.push(city);
+        if (province) addressParts.push(province);
+        if (postalCode) addressParts.push(postalCode);
+        
+        const address = addressParts.join(', ');
+        
+        try {
+            // Use Nominatim API for geocoding
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=ph`);
+            const data = await response.json();
+            
+            if (data && data.length > 0) {
+                const result = data[0];
+                const latlng = {
+                    lat: parseFloat(result.lat),
+                    lng: parseFloat(result.lon)
+                };
+                
+                // Update map view and set coordinates
+                map.setView(latlng, 16);
+                setLatLng(latlng);
+                
+                // Show success message
+                console.log('Address found:', result.display_name);
+                
+                const cityProvince = city && province ? `${city}, ${province}` : 'the area';
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Location Found!',
+                    text: `Location found near ${cityProvince}. The map has been updated with the closest matching location.`,
+                    confirmButtonText: 'Great!',
+                    confirmButtonColor: '#10b981'
+                });
+                
+                return true;
+            } else {
+                throw new Error('Address not found');
+            }
+        } catch (error) {
+            console.error('Geocoding error:', error);
+            throw error; // Re-throw to be handled by the calling function
+        }
+    }
+
     // Auto Locate button
     var autoBtn = document.getElementById('auto-locate');
-    function handleLocateSuccess(pos){
-        var latlng = {lat: pos.coords.latitude, lng: pos.coords.longitude};
-        map.setView(latlng, 16);
-        setLatLng(latlng);
-    }
-    function handleLocateError(err){
-        console.warn('Geolocation error', err);
-        alert('Unable to get your location. Please allow location permission and try again. If you are not on https://localhost or https, the browser may block geolocation.');
-    }
     if (autoBtn) {
-        autoBtn.addEventListener('click', function(){
-            if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser.');
+        autoBtn.addEventListener('click', async function(){
+            // Validate that we have at least some address information
+            const line1 = document.querySelector('input[name="line1"]').value.trim();
+            const city = document.querySelector('input[name="city"]').value.trim();
+            const province = document.querySelector('input[name="province"]').value.trim();
+            
+            if (!line1 && !city && !province) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Address Required',
+                    text: 'Please enter at least the address line, city, or province before searching on the map.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3b82f6'
+                });
                 return;
             }
-            navigator.geolocation.getCurrentPosition(handleLocateSuccess, handleLocateError, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+            
+            // Additional validation for better results
+            if (!city || !province) {
+                const result = await Swal.fire({
+                    icon: 'question',
+                    title: 'Missing Information',
+                    text: 'For better search results, it\'s recommended to fill in both City and Province. Would you like to continue with the current information?',
+                    showCancelButton: true,
+                    confirmButtonText: 'Continue',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280'
+                });
+                
+                if (!result.isConfirmed) {
+                    return;
+                }
+            }
+            
+            // Show loading state
+            const originalText = autoBtn.innerHTML;
+            autoBtn.innerHTML = '<i class="ri-loader-4-line animate-spin"></i><span class="hidden sm:inline">Searching...</span>';
+            autoBtn.disabled = true;
+            
+            try {
+                // Attempt to geocode the address using enhanced function
+                await geocodeAddress();
+            } catch (error) {
+                console.error('Geocoding failed:', error);
+                
+                // Check if it's a timeout error
+                const isTimeout = error.message.includes('timeout') || error.message.includes('taking too long');
+                
+                // Show appropriate error message
+                const cityProvince = city && province ? `${city}, ${province}` : 'the area';
+                
+                if (isTimeout) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Search Taking Too Long',
+                        html: `
+                            <div class="text-left">
+                                <p class="mb-3">The address search is taking longer than expected. This might be because:</p>
+                                <ul class="text-sm text-gray-600 mb-3 list-disc list-inside">
+                                    <li>Network connection is slow</li>
+                                    <li>The geocoding service is busy</li>
+                                    <li>The address is very specific</li>
+                                </ul>
+                                <p class="text-sm text-gray-500 mb-2">You can:</p>
+                                <ul class="text-sm text-gray-600 mb-3 list-disc list-inside">
+                                    <li>Try again in a moment</li>
+                                    <li>Manually click on the map to set the location</li>
+                                    <li>Use a broader address like "<strong>${cityProvince}</strong>"</li>
+                                </ul>
+                            </div>
+                        `,
+                        confirmButtonText: 'Got it',
+                        confirmButtonColor: '#f59e0b'
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Address Not Found',
+                        html: `
+                            <div class="text-left">
+                                <p class="mb-3">Unable to find the exact address on the map. This might be because:</p>
+                                <ul class="text-sm text-gray-600 mb-3 list-disc list-inside">
+                                    <li>The specific location isn't in the map database</li>
+                                    <li>The address format needs adjustment</li>
+                                    <li>The location is very specific or new</li>
+                                    <li>Try searching for just "<strong>${cityProvince}</strong>"</li>
+                                </ul>
+                                <p class="text-sm text-gray-500">You can still manually click on the map to set the location.</p>
+                            </div>
+                        `,
+                        confirmButtonText: 'Got it',
+                        confirmButtonColor: '#f59e0b'
+                    });
+                }
+            } finally {
+                // Restore button state
+                autoBtn.innerHTML = originalText;
+                autoBtn.disabled = false;
+            }
         });
     }
 });
