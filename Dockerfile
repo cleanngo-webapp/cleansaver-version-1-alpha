@@ -107,6 +107,7 @@ RUN echo 'server { \
 # Create supervisor configuration
 RUN echo '[supervisord]' > /etc/supervisor/conf.d/supervisord.conf && \
     echo 'nodaemon=true' >> /etc/supervisor/conf.d/supervisord.conf && \
+    echo 'user=root' >> /etc/supervisor/conf.d/supervisord.conf && \
     echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
     echo '[program:php-fpm]' >> /etc/supervisor/conf.d/supervisord.conf && \
     echo 'command=php-fpm' >> /etc/supervisor/conf.d/supervisord.conf && \
