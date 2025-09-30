@@ -1,0 +1,221 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
+
+@import "tailwindcss";
+
+@theme {
+    --color-brand-green: #248639;
+    --color-brand-gray: #d9d9d9;
+    --color-brand-highlight: #42a457;
+
+    --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, Segoe UI,
+        Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol";
+}
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* Custom loading animation for comments */
+@keyframes loading-pulse {
+    0%,
+    100% {
+        opacity: 0.4;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.loading-dots {
+    animation: loading-pulse 1.4s ease-in-out infinite;
+}
+
+.loading-dots:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.loading-dots:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Smooth fade-in animation for content */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* FullCalendar event overflow fixes */
+.fc-event {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.fc-daygrid-event {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+.fc-daygrid-event-harness {
+    overflow: hidden !important;
+    max-width: 100% !important;
+}
+
+.fc-daygrid-day-events {
+    overflow: hidden !important;
+}
+
+.fc-daygrid-day-frame {
+    overflow: hidden !important;
+}
+
+/* Calendar tooltip styling */
+.calendar-tooltip {
+    position: fixed !important;
+    z-index: 9999 !important;
+    pointer-events: none !important;
+    background: white !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.5rem !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+    padding: 0.75rem !important;
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+    max-width: 300px !important;
+    min-width: 250px !important;
+}
+
+/* Receipt-style jagged borders */
+.receipt-border {
+    position: relative;
+    background: white;
+    border: none;
+    clip-path: polygon(
+        0% 8px,
+        2% 4px,
+        4% 8px,
+        6% 0%,
+        8% 4px,
+        10% 8px,
+        12% 0%,
+        14% 4px,
+        16% 8px,
+        18% 0%,
+        20% 4px,
+        22% 8px,
+        24% 0%,
+        26% 4px,
+        28% 8px,
+        30% 0%,
+        32% 4px,
+        34% 8px,
+        36% 0%,
+        38% 4px,
+        40% 8px,
+        42% 0%,
+        44% 4px,
+        46% 8px,
+        48% 0%,
+        50% 4px,
+        52% 8px,
+        54% 0%,
+        56% 4px,
+        58% 8px,
+        60% 0%,
+        62% 4px,
+        64% 8px,
+        66% 0%,
+        68% 4px,
+        70% 8px,
+        72% 0%,
+        74% 4px,
+        76% 8px,
+        78% 0%,
+        80% 4px,
+        82% 8px,
+        84% 0%,
+        86% 4px,
+        88% 8px,
+        90% 0%,
+        92% 4px,
+        94% 8px,
+        96% 0%,
+        98% 4px,
+        100% 8px,
+        100% calc(100% - 8px),
+        98% calc(100% - 4px),
+        96% 100%,
+        94% calc(100% - 4px),
+        92% calc(100% - 8px),
+        90% 100%,
+        88% calc(100% - 4px),
+        86% calc(100% - 8px),
+        84% 100%,
+        82% calc(100% - 4px),
+        80% calc(100% - 8px),
+        78% 100%,
+        76% calc(100% - 4px),
+        74% calc(100% - 8px),
+        72% 100%,
+        70% calc(100% - 4px),
+        68% calc(100% - 8px),
+        66% 100%,
+        64% calc(100% - 4px),
+        62% calc(100% - 8px),
+        60% 100%,
+        58% calc(100% - 4px),
+        56% calc(100% - 8px),
+        54% 100%,
+        52% calc(100% - 4px),
+        50% calc(100% - 8px),
+        48% 100%,
+        46% calc(100% - 4px),
+        44% calc(100% - 8px),
+        42% 100%,
+        40% calc(100% - 4px),
+        38% calc(100% - 8px),
+        36% 100%,
+        34% calc(100% - 4px),
+        32% calc(100% - 8px),
+        30% 100%,
+        28% calc(100% - 4px),
+        26% calc(100% - 8px),
+        24% 100%,
+        22% calc(100% - 4px),
+        20% calc(100% - 8px),
+        18% 100%,
+        16% calc(100% - 4px),
+        14% calc(100% - 8px),
+        12% 100%,
+        10% calc(100% - 4px),
+        8% calc(100% - 8px),
+        6% 100%,
+        4% calc(100% - 4px),
+        2% calc(100% - 8px),
+        0% 100%
+    );
+}
