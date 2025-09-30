@@ -16,38 +16,30 @@
     RUN npm run build
     
     
-    # ---------- Stage 2: PHP + Apache ----------
-    FROM php:8.1.25-apache
-    
-    # Install system dependencies
-    RUN apt-get update && apt-get install -y \
-        git unzip curl libpng-dev libonig-dev libxml2-dev zip \
-        && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd
-    
-    # Enable Apache Rewrite
-    RUN a2enmod rewrite
-    
-    # Use pinned Composer
-    COPY --from=composer:2.8.9 /usr/bin/composer /usr/bin/composer
-    
-    # Set working directory
-    WORKDIR /var/www/html
-    
-    # Copy application code (but ignore node_modules/vendor via .dockerignore)
-    COPY . .
-    
-    # Copy built assets from Node stage
-    COPY --from=node_builder /app/public/build ./public/build
-    
-    # Install PHP dependencies (use composer.lock for pinned versions)
-    RUN composer install --no-dev --optimize-autoloader
-    
-    # Fix permissions
-    RUN chown -R www-data:www-data /var/www/html \
-        && chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
-    
-    # Expose Apache port
-    EXPOSE 80
-    
-    CMD ["apache2-foreground"]
+  # ---------- Stage 2: PHP + Apache ----------
+FROM php:8.1.25-apache
+
+# Install system dependencies + PostgreSQL headers
+RUN apt-get update && apt-get install -y \
+    git unzip curl libpng-dev libonig-dev libxml2-dev zip libpq-dev \
+    && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd
+
+# Enable Apache Rewrite
+RUN a2enmod rewrite
+
+# Use pinned Composer
+COPY --from=composer:2.8.9 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www/html
+COPY . .
+COPY --from=node_builder /app/public/build ./public/build
+
+RUN composer install --no-dev --optimize-autoloader
+
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
+
+EXPOSE 80
+CMD ["apache2-foreground"]
+
     
