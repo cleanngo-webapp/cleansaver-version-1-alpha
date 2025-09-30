@@ -9,7 +9,6 @@ export default defineConfig({
         }),
     ],
     build: {
-        // Enable CSS code splitting to avoid conflict with Laravel Vite plugin
         cssCodeSplit: true,
         manifest: true,
     },
