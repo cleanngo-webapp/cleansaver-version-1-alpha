@@ -1,12 +1,15 @@
-# Stage 1 - Build Frontend (Vite with npm)
+# Stage 1 - Build Frontend (Vite with pnpm)
 FROM node:22.14.0 AS frontend
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# Install pnpm globally
+RUN npm install -g pnpm@10.15.1
 
-# Install dependencies using npm (including dev dependencies for build)
-RUN npm install
+# Copy package files (pnpm uses pnpm-lock.yaml)
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies using pnpm (including dev dependencies for build)
+RUN pnpm install --frozen-lockfile
 
 # Copy source files
 COPY . .
@@ -15,24 +18,23 @@ COPY . .
 RUN echo "Checking package.json build script..." && \
     cat package.json | grep -A 5 -B 5 "build" && \
     echo "Checking if vite is installed..." && \
-    npm list vite && \
-    echo "Checking npm scripts..." && \
-    npm run
+    pnpm list vite && \
+    echo "Checking pnpm scripts..." && \
+    pnpm run
 
 # Build frontend assets with error handling
-RUN npm run build || (echo "Build failed, trying alternative..." && npx vite build)
+RUN pnpm run build || (echo "Build failed, trying alternative..." && npx vite build)
 
-# Verify build output and ensure dist folder exists
-RUN echo "Checking build output..." && \
+# Verify build output - Laravel Vite plugin outputs to public/build/
+RUN echo "=== Checking Vite build output ===" && \
+    echo "Public directory contents:" && \
     ls -la public/ && \
-    mkdir -p public/dist && \
-    if [ ! "$(ls -A public/dist 2>/dev/null)" ]; then \
-        echo "Build completed but dist folder is empty" > public/dist/build-info.txt; \
-    fi && \
-    echo "Final public directory contents:" && \
-    ls -la public/ && \
-    echo "Dist folder contents:" && \
-    ls -la public/dist/
+    echo "Checking for build folder (Laravel Vite default):" && \
+    ls -la public/build/ 2>/dev/null || echo "No build folder found" && \
+    echo "Checking for manifest files:" && \
+    find public/ -name "manifest.json" -type f 2>/dev/null || echo "No manifest.json found" && \
+    echo "Final public directory structure:" && \
+    find public/ -type f -name "*.json" -o -name "*.js" -o -name "*.css" 2>/dev/null || echo "No assets found"
 
 # Stage 2 - Backend (Laravel + PHP + Composer + Nginx)
 FROM php:8.1.25-fpm AS backend
@@ -57,8 +59,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Copy application files
 COPY . .
 
-# Copy built frontend from Stage 1 to correct Laravel Vite location
-COPY --from=frontend /app/public/dist ./public/build
+# Copy built frontend from Stage 1 - Laravel Vite plugin outputs to public/build/
+COPY --from=frontend /app/public/build ./public/build
 
 # Create minimal .env for Laravel commands
 RUN echo "APP_NAME=Laravel" > .env && \
