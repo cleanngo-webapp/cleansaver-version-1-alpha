@@ -56,7 +56,6 @@ public/storage
 composer.phar
 
 # Laravel specific
-artisan
 bootstrap/cache/*.php
 storage/app/*
 storage/framework/cache/*

@@ -66,7 +66,12 @@ RUN if [ ! -f .env ]; then \
         echo "DB_PORT=5432" >> .env && \
         echo "DB_DATABASE=cleanngo" >> .env && \
         echo "DB_USERNAME=postgres" >> .env && \
-        echo "DB_PASSWORD=password" >> .env; \
+        echo "DB_PASSWORD=password" >> .env && \
+        echo "LOG_CHANNEL=stack" >> .env && \
+        echo "LOG_LEVEL=error" >> .env && \
+        echo "CACHE_DRIVER=file" >> .env && \
+        echo "SESSION_DRIVER=file" >> .env && \
+        echo "QUEUE_CONNECTION=sync" >> .env; \
     fi
 
 # Set proper permissions
@@ -74,13 +79,11 @@ RUN chown -R www-data:www-data /var/www \
     && chmod -R 755 /var/www/storage \
     && chmod -R 755 /var/www/bootstrap/cache
 
-# Generate application key if not set
-RUN php artisan key:generate --no-interaction
-
-# Laravel setup
-RUN php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+# Generate application key if not set and run Laravel setup
+RUN php artisan key:generate --no-interaction || echo "Key generation failed, continuing..." && \
+    php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
 
 # Create nginx configuration
 RUN echo 'server { \
