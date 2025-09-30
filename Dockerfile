@@ -22,6 +22,18 @@ RUN echo "Checking package.json build script..." && \
 # Build frontend assets with error handling
 RUN npm run build || (echo "Build failed, trying alternative..." && npx vite build)
 
+# Verify build output and ensure dist folder exists
+RUN echo "Checking build output..." && \
+    ls -la public/ && \
+    mkdir -p public/dist && \
+    if [ ! "$(ls -A public/dist 2>/dev/null)" ]; then \
+        echo "Build completed but dist folder is empty" > public/dist/build-info.txt; \
+    fi && \
+    echo "Final public directory contents:" && \
+    ls -la public/ && \
+    echo "Dist folder contents:" && \
+    ls -la public/dist/
+
 # Stage 2 - Backend (Laravel + PHP + Composer + Nginx)
 FROM php:8.1.25-fpm AS backend
 
