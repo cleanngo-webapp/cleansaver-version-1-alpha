@@ -1,21 +1,18 @@
-# Stage 1 - Build Frontend (Vite with pnpm)
+# Stage 1 - Build Frontend (Vite with npm)
 FROM node:22.14.0 AS frontend
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm@10.15.1
-
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json package-lock.json* ./
 
-# Install dependencies using pnpm
-RUN pnpm install --frozen-lockfile
+# Install dependencies using npm
+RUN npm ci --only=production || npm install
 
 # Copy source files
 COPY . .
 
 # Build frontend assets
-RUN pnpm run build
+RUN npm run build
 
 # Stage 2 - Backend (Laravel + PHP + Composer + Nginx)
 FROM php:8.1.25-fpm AS backend
