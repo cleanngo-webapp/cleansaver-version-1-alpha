@@ -1,15 +1,23 @@
-# Stage 1 - Build Frontend (Vite with pnpm)
+# Stage 1 - Build Frontend (Vite with npm - more reliable in Docker)
 FROM node:22.14.0 AS frontend
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm@10.15.1
+# Copy package files (using npm instead of pnpm for better Docker compatibility)
+COPY package.json package-lock.json* ./
 
-# Copy package files (pnpm uses pnpm-lock.yaml)
-COPY package.json pnpm-lock.yaml ./
+# Debug: Check package files
+RUN echo "=== Checking package files ===" && \
+    echo "Package.json exists:" && \
+    ls -la package.json && \
+    echo "Package-lock.json exists:" && \
+    ls -la package-lock.json* 2>/dev/null || echo "No package-lock.json found" && \
+    echo "Node version:" && \
+    node --version && \
+    echo "NPM version:" && \
+    npm --version
 
-# Install dependencies using pnpm (including dev dependencies for build)
-RUN pnpm install --frozen-lockfile
+# Install dependencies using npm (including dev dependencies for build)
+RUN npm install
 
 # Copy source files
 COPY . .
@@ -18,12 +26,12 @@ COPY . .
 RUN echo "Checking package.json build script..." && \
     cat package.json | grep -A 5 -B 5 "build" && \
     echo "Checking if vite is installed..." && \
-    pnpm list vite && \
-    echo "Checking pnpm scripts..." && \
-    pnpm run
+    npm list vite && \
+    echo "Checking npm scripts..." && \
+    npm run
 
 # Build frontend assets with error handling
-RUN pnpm run build || (echo "Build failed, trying alternative..." && npx vite build)
+RUN npm run build || (echo "Build failed, trying alternative..." && npx vite build)
 
 # Verify build output - Laravel Vite plugin outputs to public/build/
 RUN echo "=== Checking Vite build output ===" && \
