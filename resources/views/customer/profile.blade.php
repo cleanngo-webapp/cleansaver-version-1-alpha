@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     function handleLocateError(err){
         console.warn('Geolocation error', err);
-        alert('Unable to get your location. Please allow location permission and try again. If you are not on http://localhost or https, the browser may block geolocation.');
+        alert('Unable to get your location. Please allow location permission and try again. If you are not on https://localhost or https, the browser may block geolocation.');
     }
     if (autoBtn) {
         autoBtn.addEventListener('click', function(){

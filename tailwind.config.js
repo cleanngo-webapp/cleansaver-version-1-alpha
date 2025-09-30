@@ -9,9 +9,9 @@ module.exports = {
         extend: {
             colors: {
                 brand: {
-                    green:"#248639", // dark shade
-                    gray:"#D9D9D9", // dark shade
-                    highlight: "#42A457", // selected shade
+                    green: "#248639",
+                    gray: "#D9D9D9",
+                    highlight: "#42A457",
                 },
             },
             fontFamily: {
