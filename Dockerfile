@@ -68,11 +68,11 @@ RUN if [ ! -f .env ]; then \
         echo "APP_DEBUG=false" >> .env && \
         echo "APP_URL=http://localhost" >> .env && \
         echo "DB_CONNECTION=pgsql" >> .env && \
-        echo "DB_HOST=db" >> .env && \
+        echo "DB_HOST=aws-1-ap-southeast-1.pooler.supabase.com" >> .env && \
         echo "DB_PORT=5432" >> .env && \
-        echo "DB_DATABASE=cleanngo" >> .env && \
-        echo "DB_USERNAME=postgres" >> .env && \
-        echo "DB_PASSWORD=password" >> .env && \
+        echo "DB_DATABASE=postgres" >> .env && \
+        echo "DB_USERNAME=postgres.bscddyfdbwceljvjvbro" >> .env && \
+        echo "DB_PASSWORD=pjoHCtcFje2sCItg" >> .env && \
         echo "LOG_CHANNEL=stack" >> .env && \
         echo "LOG_LEVEL=error" >> .env && \
         echo "CACHE_DRIVER=file" >> .env && \
