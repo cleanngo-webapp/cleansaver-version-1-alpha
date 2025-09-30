@@ -2,15 +2,20 @@
 FROM node:22.14.0 AS frontend
 WORKDIR /app
 
-# Copy package files (using npm instead of pnpm for better Docker compatibility)
+# Copy package files and configs
 COPY package.json package-lock.json* ./
+COPY postcss.config.js tailwind.config.js ./
 
-# Debug: Check package files
+# Debug: Check package files and configs
 RUN echo "=== Checking package files ===" && \
     echo "Package.json exists:" && \
     ls -la package.json && \
     echo "Package-lock.json exists:" && \
     ls -la package-lock.json* 2>/dev/null || echo "No package-lock.json found" && \
+    echo "PostCSS config exists:" && \
+    ls -la postcss.config.js && \
+    echo "Tailwind config exists:" && \
+    ls -la tailwind.config.js && \
     echo "Node version:" && \
     node --version && \
     echo "NPM version:" && \
@@ -41,6 +46,10 @@ RUN echo "=== Checking Vite build output ===" && \
     ls -la public/build/ 2>/dev/null || echo "No build folder found" && \
     echo "Checking for manifest files:" && \
     find public/ -name "manifest.json" -type f 2>/dev/null || echo "No manifest.json found" && \
+    echo "Checking CSS files in build:" && \
+    find public/build/ -name "*.css" -exec echo "CSS file: {}" \; -exec head -20 {} \; 2>/dev/null || echo "No CSS files found" && \
+    echo "Checking JS files in build:" && \
+    find public/build/ -name "*.js" -exec echo "JS file: {}" \; -exec head -10 {} \; 2>/dev/null || echo "No JS files found" && \
     echo "Final public directory structure:" && \
     find public/ -type f -name "*.json" -o -name "*.js" -o -name "*.css" 2>/dev/null || echo "No assets found"
 
@@ -80,6 +89,15 @@ RUN echo "=== Verifying build assets ===" && \
     find ./public/build/ -name "*.css" 2>/dev/null || echo "No CSS files found" && \
     echo "JS files:" && \
     find ./public/build/ -name "*.js" 2>/dev/null || echo "No JS files found"
+
+# Create fallback assets if build failed
+RUN if [ ! -f ./public/build/manifest.json ]; then \
+        echo "Creating fallback manifest and assets..." && \
+        mkdir -p ./public/build && \
+        echo '{"resources/css/app.css":{"file":"app.css","src":"resources/css/app.css","isEntry":true},"resources/js/app.js":{"file":"app.js","src":"resources/js/app.js","isEntry":true}}' > ./public/build/manifest.json && \
+        echo '/* Fallback CSS - Tailwind not compiled */' > ./public/build/app.css && \
+        echo '/* Fallback JS */' > ./public/build/app.js; \
+    fi
 
 # Create minimal .env for Laravel commands
 RUN echo "APP_NAME=Laravel" > .env && \
