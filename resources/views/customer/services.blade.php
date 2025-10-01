@@ -26,23 +26,23 @@
             <div data-form="sofa" class="hidden">
                 <h2 class="font-semibold text-center">Sofa Deep Cleaning</h2>
                 <div class="mt-3 flex flex-col gap-2 text-sm">
-                    <div class="flex items-center gap-2"><span class="flex-1">1 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_1" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">2 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_2" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">3 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_3" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">4 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_4" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">5 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_5" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">6 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_6" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">7 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_7" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">8 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_8" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">L-shape</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_l" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Cross Sectional</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_cross" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">1 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_1" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">2 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_2" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">3 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_3" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">4 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_4" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">5 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_5" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">6 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_6" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">7 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_7" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">8 seater</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_8" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">L-shape</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_l" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Cross Sectional</span><span class="w-10 text-center text-white">Qty</span><input id="sofa_cross" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
                 </div>
                 <h2 class="font-semibold mt-6 text-center">Mattress Deep Cleaning</h2>
                 <div class="mt-3 flex flex-col gap-2 text-sm">
-                    <div class="flex items-center gap-2"><span class="flex-1">Single bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_single" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Double bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_double" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">King bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_king" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">California bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_california" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Single bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_single" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Double bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_double" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">King bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_king" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">California bed</span><span class="w-10 text-center text-white">Qty</span><input id="mattress_california" type="number" min="0" value="0" class="border rounded px-1 py-1 w-20 text-right text-black"></div>
             </div>
             </div>
 
@@ -50,8 +50,8 @@
             <div data-form="carpet" class="hidden">
                 <h2 class="font-semibold text-center">Carpet Deep Cleaning</h2>
                 <div class="mt-3 flex flex-col gap-2 text-sm">
-                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="carpet_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="carpet_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="carpet_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="carpet_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
                 </div>
             </div>
 
@@ -59,10 +59,10 @@
             <div data-form="carInterior" class="hidden">
                 <h2 class="font-semibold text-center">Home Service Car Interior Detailing</h2>
                 <div class="mt-3 flex flex-col gap-2 text-sm">
-                    <div class="flex items-center gap-2"><span class="flex-1">Sedan</span><span class="w-10 text-center text-white">Qty</span><input id="car_sedan" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">SUV</span><span class="w-10 text-center text-white">Qty</span><input id="car_suv" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Van</span><span class="w-10 text-center text-white">Qty</span><input id="car_van" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Coaster</span><span class="w-10 text-center text-white">Qty</span><input id="car_coaster" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Sedan</span><span class="w-10 text-center text-white">Qty</span><input id="car_sedan" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">SUV</span><span class="w-10 text-center text-white">Qty</span><input id="car_suv" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Van</span><span class="w-10 text-center text-white">Qty</span><input id="car_van" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Coaster</span><span class="w-10 text-center text-white">Qty</span><input id="car_coaster" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
                 </div>
             </div>
 
@@ -70,8 +70,8 @@
             <div data-form="postConstruction" class="hidden">
                 <h2 class="font-semibold text-center">Post Construction Cleaning</h2>
                 <div class="mt-3 flex flex-col gap-2 text-sm">
-                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="pcc_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="pcc_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="pcc_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="pcc_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
                 </div>
             </div>
 
@@ -79,8 +79,8 @@
             <div data-form="disinfection" class="hidden">
                 <h2 class="font-semibold text-center">Enhanced Disinfection</h2>
                 <div class="mt-3 flex flex-col gap-2 text-sm">
-                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="disinfect_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="disinfect_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="disinfect_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="disinfect_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
                 </div>
             </div>
 
@@ -88,8 +88,8 @@
             <div data-form="glass" class="hidden">
                 <h2 class="font-semibold text-center">Glass Cleaning</h2>
                 <div class="mt-3 flex flex-col gap-2 text-sm">
-                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="glass_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
-                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="glass_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">How many square meters?</span><span class="w-10 text-center text-white">Qty</span><input id="glass_sqm" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
+                    <div class="flex items-center gap-2"><span class="flex-1">Quantity</span><span class="w-10 text-center text-white">Qty</span><input id="glass_qty" type="number" min="0" value="0" class="border rounded px-2 py-1 w-20 text-right text-black"></div>
                 </div>
             </div>
         </section>
