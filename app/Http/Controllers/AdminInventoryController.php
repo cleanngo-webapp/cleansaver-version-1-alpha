@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InventoryItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class AdminInventoryController extends Controller
 {
@@ -23,13 +24,19 @@ class AdminInventoryController extends Controller
      */
     public function store(Request $request)
     {
+        // Log the incoming request for debugging
+        Log::info('Inventory store request received', [
+            'data' => $request->all(),
+            'headers' => $request->headers->all()
+        ]);
+        
         // Validate the request data (removed item_code validation since it will be auto-generated)
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'category' => 'required|in:Tools,Machine,Cleaning Agent,Consumables',
-            'quantity' => 'required|integer|min:0',
+            'category' => 'required|string|max:255',
+            'quantity' => 'required|numeric|min:0',
             'unit_price' => 'required|numeric|min:0',
-            'reorder_level' => 'required|integer|min:0',
+            'reorder_level' => 'required|numeric|min:0',
             'notes' => 'nullable|string'
         ]);
 
@@ -45,11 +52,19 @@ class AdminInventoryController extends Controller
             // Auto-generate item code in format: I2025XXX (I + year + 3-digit unique number)
             $itemCode = $this->generateItemCode();
             
-            // Create the item with auto-generated code
+            // Create the item with auto-generated code and ensure is_active is set
             $itemData = $request->all();
             $itemData['item_code'] = $itemCode;
+            $itemData['is_active'] = true; // Ensure new items are active by default
             
             $item = InventoryItem::create($itemData);
+            
+            // Log successful creation
+            Log::info('Inventory item created successfully', [
+                'item_id' => $item->id,
+                'item_code' => $item->item_code,
+                'name' => $item->name
+            ]);
             
             return response()->json([
                 'success' => true,
@@ -77,7 +92,7 @@ class AdminInventoryController extends Controller
             ->orderBy('item_code', 'desc')
             ->first();
         
-        if ($lastItem) {
+        if ($lastItem && $lastItem->item_code) {
             // Extract the number part and increment
             $lastNumber = (int) substr($lastItem->item_code, -3);
             $newNumber = $lastNumber + 1;
@@ -113,14 +128,19 @@ class AdminInventoryController extends Controller
         // Validate the request data (item_code is not editable, so removed from validation)
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'category' => 'required|in:Tools,Machine,Cleaning Agent,Consumables',
-            'quantity' => 'required|integer|min:0',
+            'category' => 'required|string|max:255',
+            'quantity' => 'required|numeric|min:0',
             'unit_price' => 'required|numeric|min:0',
-            'reorder_level' => 'required|integer|min:0',
+            'reorder_level' => 'required|numeric|min:0',
             'notes' => 'nullable|string'
         ]);
 
         if ($validator->fails()) {
+            Log::error('Inventory update validation failed', [
+                'errors' => $validator->errors(),
+                'data' => $request->all()
+            ]);
+            
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed',

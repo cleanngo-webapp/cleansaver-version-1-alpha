@@ -321,226 +321,340 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-// Modal functions
-function openAddModal() {
-    document.getElementById('addModal').classList.remove('hidden');
-}
+// Wait for DOM to be fully loaded before adding event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal functions
+    function openAddModal() {
+        document.getElementById('addModal').classList.remove('hidden');
+    }
 
-function closeAddModal() {
-    document.getElementById('addModal').classList.add('hidden');
-    document.getElementById('addForm').reset();
-}
+    function closeAddModal() {
+        document.getElementById('addModal').classList.add('hidden');
+        document.getElementById('addForm').reset();
+    }
 
-function openEditModal(itemId) {
-    // Fetch item data and populate form
-    fetch(`/admin/inventory/${itemId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const item = data.item;
-                document.getElementById('edit_item_id').value = item.id;
-                document.getElementById('edit_name').value = item.name;
-                document.getElementById('edit_category').value = item.category;
-                document.getElementById('edit_quantity').value = parseInt(item.quantity);
-                document.getElementById('edit_unit_price').value = item.unit_price;
-                document.getElementById('edit_reorder_level').value = parseInt(item.reorder_level);
-                document.getElementById('edit_notes').value = item.notes || '';
-                
-                document.getElementById('editModal').classList.remove('hidden');
-            }
-        })
-        .catch(error => {
-            Swal.fire('Error', 'Failed to load item data', 'error');
-        });
-}
-
-function closeEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
-}
-
-function openViewModal(itemId) {
-    // Fetch item data and display
-    fetch(`/admin/inventory/${itemId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const item = data.item;
-                const statusColor = item.status === 'In Stock' ? 'green' : 
-                                  item.status === 'Low Stock' ? 'yellow' : 'red';
-                
-                document.getElementById('viewContent').innerHTML = `
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Item Code</label>
-                            <p class="text-sm text-gray-900">${item.item_code}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Category</label>
-                            <p class="text-sm text-gray-900">${item.category}</p>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700">Item Name</label>
-                            <p class="text-sm text-gray-900">${item.name}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Quantity</label>
-                            <p class="text-sm text-gray-900">${parseInt(item.quantity)}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Unit Price</label>
-                            <p class="text-sm text-gray-900">₱${parseFloat(item.unit_price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Total Value</label>
-                            <p class="text-sm font-medium text-gray-900">₱${(parseFloat(item.unit_price) * parseInt(item.quantity)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Re-order Level</label>
-                            <p class="text-sm text-gray-900">${parseInt(item.reorder_level)}</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Status</label>
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-${statusColor}-100 text-${statusColor}-800">
-                                ${item.status}
-                            </span>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700">Created</label>
-                            <p class="text-sm text-gray-900">${new Date(item.created_at).toLocaleDateString()}</p>
-                        </div>
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700">Last Updated</label>
-                            <p class="text-sm text-gray-900">${new Date(item.updated_at).toLocaleDateString()}</p>
-                        </div>
-                        ${item.notes ? `
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                <p class="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">${item.notes}</p>
-                            </div>
-                        </div>
-                        ` : `
-                        <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                <p class="text-sm text-gray-500 italic">No notes available for this item.</p>
-                            </div>
-                        </div>
-                        `}
-                    </div>
-                `;
-                document.getElementById('viewModal').classList.remove('hidden');
-            }
-        })
-        .catch(error => {
-            Swal.fire('Error', 'Failed to load item data', 'error');
-        });
-}
-
-function closeViewModal() {
-    document.getElementById('viewModal').classList.add('hidden');
-}
-
-// Form submissions
-document.getElementById('addForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    // Show loading state
-    const submitButton = document.querySelector('#addForm button[type="submit"]');
-    const originalButtonContent = submitButton.innerHTML;
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div>Adding Item...';
-    
-    fetch('/admin/inventory', {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            Swal.fire({
-                icon: 'success',
-                title: 'Success!',
-                text: data.message,
-                confirmButtonColor: '#10b981'
-            }).then(() => {
-                location.reload();
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: data.message || 'An error occurred while creating the inventory item.',
-                confirmButtonColor: '#dc2626'
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'An error occurred while creating the inventory item. Please try again.',
-            confirmButtonColor: '#dc2626'
-        });
-    })
-    .finally(() => {
-        // Reset button
-        submitButton.disabled = false;
-        submitButton.innerHTML = originalButtonContent;
-    });
-});
-
-// Delete function
-function deleteItem(itemId, buttonElement) {
-    Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            // Show loading state on the delete button
-            const deleteButton = buttonElement;
-            const originalButtonContent = deleteButton.innerHTML;
-            deleteButton.disabled = true;
-            deleteButton.innerHTML = '<div class="w-4 h-4 border-2 border-red-300 border-t-transparent rounded-full animate-spin"></div>';
-            
-            fetch(`/admin/inventory/${itemId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                }
-            })
+    function openEditModal(itemId) {
+        // Fetch item data and populate form
+        fetch(`/admin/inventory/${itemId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    Swal.fire('Deleted!', data.message, 'success').then(() => {
-                        location.reload();
-                    });
-                } else {
-                    Swal.fire('Error', data.message, 'error');
-                    // Reset button on error
-                    deleteButton.disabled = false;
-                    deleteButton.innerHTML = originalButtonContent;
+                    const item = data.item;
+                    document.getElementById('edit_item_id').value = item.id;
+                    document.getElementById('edit_name').value = item.name;
+                    document.getElementById('edit_category').value = item.category;
+                    document.getElementById('edit_quantity').value = parseInt(item.quantity);
+                    document.getElementById('edit_unit_price').value = item.unit_price;
+                    document.getElementById('edit_reorder_level').value = parseInt(item.reorder_level);
+                    document.getElementById('edit_notes').value = item.notes || '';
+                    
+                    document.getElementById('editModal').classList.remove('hidden');
                 }
             })
             .catch(error => {
-                Swal.fire('Error', 'Failed to delete item', 'error');
-                // Reset button on error
-                deleteButton.disabled = false;
-                deleteButton.innerHTML = originalButtonContent;
+                Swal.fire('Error', 'Failed to load item data', 'error');
             });
-        }
-    });
-}
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+    }
+
+    function openViewModal(itemId) {
+        // Fetch item data and display
+        fetch(`/admin/inventory/${itemId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const item = data.item;
+                    const statusColor = item.status === 'In Stock' ? 'green' : 
+                                      item.status === 'Low Stock' ? 'yellow' : 'red';
+                    
+                    document.getElementById('viewContent').innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Item Code</label>
+                                <p class="text-sm text-gray-900">${item.item_code}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Category</label>
+                                <p class="text-sm text-gray-900">${item.category}</p>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Item Name</label>
+                                <p class="text-sm text-gray-900">${item.name}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Quantity</label>
+                                <p class="text-sm text-gray-900">${parseInt(item.quantity)}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Unit Price</label>
+                                <p class="text-sm text-gray-900">₱${parseFloat(item.unit_price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Total Value</label>
+                                <p class="text-sm font-medium text-gray-900">₱${(parseFloat(item.unit_price) * parseInt(item.quantity)).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Re-order Level</label>
+                                <p class="text-sm text-gray-900">${parseInt(item.reorder_level)}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Status</label>
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-${statusColor}-100 text-${statusColor}-800">
+                                    ${item.status}
+                                </span>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Created</label>
+                                <p class="text-sm text-gray-900">${new Date(item.created_at).toLocaleDateString()}</p>
+                            </div>
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700">Last Updated</label>
+                                <p class="text-sm text-gray-900">${new Date(item.updated_at).toLocaleDateString()}</p>
+                            </div>
+                            ${item.notes ? `
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                    <p class="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">${item.notes}</p>
+                                </div>
+                            </div>
+                            ` : `
+                            <div class="col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                    <p class="text-sm text-gray-500 italic">No notes available for this item.</p>
+                                </div>
+                            </div>
+                            `}
+                        </div>
+                    `;
+                    document.getElementById('viewModal').classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                Swal.fire('Error', 'Failed to load item data', 'error');
+            });
+    }
+
+    function closeViewModal() {
+        document.getElementById('viewModal').classList.add('hidden');
+    }
+
+    // Form submissions
+    const addForm = document.getElementById('addForm');
+    if (addForm) {
+        addForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Debug: Log form data
+            console.log('Form data being submitted:');
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+            
+            // Show loading state
+            const submitButton = document.querySelector('#addForm button[type="submit"]');
+            const originalButtonContent = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div>Adding Item...';
+            
+            fetch('/admin/inventory', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: data.message || 'An error occurred while creating the inventory item.',
+                        confirmButtonColor: '#dc2626'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while creating the inventory item. Please try again.',
+                    confirmButtonColor: '#dc2626'
+                });
+            })
+            .finally(() => {
+                // Reset button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonContent;
+            });
+        });
+    } else {
+        console.error('Add form not found!');
+    }
+
+    // Edit form submission
+    const editForm = document.getElementById('editForm');
+    if (editForm) {
+        editForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const itemId = document.getElementById('edit_item_id').value;
+            
+            // Remove item_id from form data since it's not needed for validation
+            formData.delete('item_id');
+            
+            // Convert FormData to a plain object for JSON submission
+            const data = {};
+            for (let [key, value] of formData.entries()) {
+                data[key] = value;
+            }
+
+            // Debug: Log form data
+            console.log('Edit form data being submitted (as object):', data);
+            
+            // Show loading state
+            const submitButton = document.querySelector('#editForm button[type="submit"]');
+            const originalButtonContent = submitButton.innerHTML;
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div>Updating Item...';
+            
+            fetch(`/admin/inventory/${itemId}`, {
+                method: 'PUT',
+                body: JSON.stringify(data), // Send as JSON
+                headers: {
+                    'Content-Type': 'application/json', // Specify JSON content type
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                console.log('Edit response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('Edit response data:', data);
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: data.message,
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    let errorMessage = data.message || 'An error occurred while updating the inventory item.';
+                    
+                    // If there are specific validation errors, show them
+                    if (data.errors) {
+                        const errorList = Object.values(data.errors).flat().join('\n');
+                        errorMessage += '\n\nDetails:\n' + errorList;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage,
+                        confirmButtonColor: '#dc2626'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Edit Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred while updating the inventory item. Please try again.',
+                    confirmButtonColor: '#dc2626'
+                });
+            })
+            .finally(() => {
+                // Reset button
+                submitButton.disabled = false;
+                submitButton.innerHTML = originalButtonContent;
+            });
+        });
+    } else {
+        console.error('Edit form not found!');
+    }
+
+    // Delete function
+    function deleteItem(itemId, buttonElement) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading state on the delete button
+                const deleteButton = buttonElement;
+                const originalButtonContent = deleteButton.innerHTML;
+                deleteButton.disabled = true;
+                deleteButton.innerHTML = '<div class="w-4 h-4 border-2 border-red-300 border-t-transparent rounded-full animate-spin"></div>';
+                
+                fetch(`/admin/inventory/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire('Deleted!', data.message, 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                        // Reset button on error
+                        deleteButton.disabled = false;
+                        deleteButton.innerHTML = originalButtonContent;
+                    }
+                })
+                .catch(error => {
+                    Swal.fire('Error', 'Failed to delete item', 'error');
+                    // Reset button on error
+                    deleteButton.disabled = false;
+                    deleteButton.innerHTML = originalButtonContent;
+                });
+            }
+        });
+    }
+
+    // Make functions globally available
+    window.openAddModal = openAddModal;
+    window.closeAddModal = closeAddModal;
+    window.openEditModal = openEditModal;
+    window.closeEditModal = closeEditModal;
+    window.openViewModal = openViewModal;
+    window.closeViewModal = closeViewModal;
+    window.deleteItem = deleteItem;
+});
 </script>
